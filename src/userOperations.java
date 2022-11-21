@@ -1,7 +1,5 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
 
 public class userOperations {
 
@@ -280,5 +278,66 @@ public class userOperations {
         }
         return false;
     }
+    public void  updateUserProducts(Connection conn, String username, ArrayList<String> incomingList){ //username,input array
+        Statement statement;
+        ResultSet rs = null;
 
+        int arrSize = incomingList.size();
+
+        String[] userarray = new String[arrSize];
+
+        for(int i = 0; i<arrSize; i++)
+        {
+            userarray[i] = incomingList.get(i);
+        }
+        try{
+            String Query=String.format("select * from usertable where username='%s'",username);
+
+            statement= conn.createStatement();
+            rs=statement.executeQuery(Query);//here this means it will execute the statement and return it to rs and result is iterable
+            while(rs.next()){
+                if(rs.getArray("products")==null){
+                    Array array = conn.createArrayOf("text",userarray);
+                    PreparedStatement st ;
+                    st=conn.prepareStatement("update usertable set products = ? where username = ?");
+                    st.setArray(1,array);
+                    st.setString(2,username);
+                    st.executeUpdate();
+                    System.out.println("products updated");
+                }
+                else{
+                    Array a = rs.getArray("products");
+                    String[] products = (String[])a.getArray();
+
+                    int len1 = products.length;
+                    int len2 = userarray.length;
+
+                    String[] thirdarray = new String[len1+len2];
+
+                    for(int i = 0; i<len1; i++)
+                    {
+                        thirdarray[i] = products[i];
+                    }
+
+                    int j = 0;
+
+                    for (int i = len1; i<len2+len1; i++)
+                    {
+                        thirdarray[i] = userarray[j];
+                        j++;
+                    }
+                    PreparedStatement st ;
+                    st=conn.prepareStatement("update usertable set products = ? where username = ?");
+                    Array array = conn.createArrayOf("text",thirdarray);
+                    st.setArray(1,array);
+                    st.setString(2,username);
+                    st.executeUpdate();
+                    System.out.println("products updated");
+                }
+            }
+        }catch (Exception e){
+            System.out.println(e);
+        }
+
+    }
 }

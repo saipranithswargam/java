@@ -1,5 +1,7 @@
 import java.sql.*;
 import java.sql.Connection;
+import java.util.ArrayList;
+
 public class Products {
     public Connection connect_to_db(String dbname, String user, String pass) {
 
@@ -147,6 +149,25 @@ public class Products {
         }
     }
 
+    public int  readProductQuantity(Connection conn,String productName){
+        Statement statement;
+        ResultSet rs = null;
+        try{
+            String Query=String.format("select * from products where productname='%s'",productName);
+            statement= conn.createStatement();;
+
+            rs=statement.executeQuery(Query);
+
+            while(rs.next()){
+                int quantity = rs.getInt("quantity");
+                return quantity;
+            }
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        return 0;
+    }
+
     public int getPrice(Connection conn,String productName)
     {
         Statement statement;
@@ -167,5 +188,28 @@ public class Products {
         return 0;
     }
 
+    public void updateProductQuantity(Connection conn, ArrayList<String> products, ArrayList<Integer> quantity)
+    {
+        Statement statement;
+        try{
+
+            int len = products.size();
+
+            for(int i = 0; i<len; i++)
+            {
+
+                String query = String.format("update products set quantity= quantity - '%d' where productname='%s'",quantity.get(i), products.get(i));
+                statement=conn.createStatement();
+                statement.executeUpdate(query);
+
+            }
+
+            System.out.println("newQuantity updated!");
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+    }
 
 }

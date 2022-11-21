@@ -37,11 +37,12 @@ public class Main {
                     System.out.println("5.Forgot Password");
                     System.out.println("6.Add products to cart");
                     System.out.println("7.Checkout");
-                    System.out.println("8.Exit From operation");
+                    System.out.println("8.view cart");
+                    System.out.println("9.Exit From operation");
                     Scanner UserScanner = new Scanner(System.in);
                     String UserOptions = UserScanner.nextLine();
                     UserOptions = UserOptions.trim();
-                    if (UserOptions.equals("8")) {
+                    if (UserOptions.equals("9")) {
                         System.out.println("*********************Logged Out Automatically********************\n");
                         break;
                     } else if (UserOptions.equals("1")) {
@@ -157,9 +158,14 @@ public class Main {
                                         Scanner quantityScanner = new Scanner(System.in);
                                         System.out.println("Enter Product Quantity:");
                                         int productQuantity = quantityScanner.nextInt();
-                                        System.out.println("Product has been added to your cart");
-                                        products.add(productname);
-                                        quantity.add(productQuantity);
+                                        int quantityInStock = productsdb.readProductQuantity(conn,productname);
+                                        if(quantityInStock<productQuantity){
+                                            System.out.println("Stock doesn't have mentioned quantity");
+                                        }else{
+                                            System.out.println("Product has been added to your cart");
+                                            products.add(productname);
+                                            quantity.add(productQuantity);
+                                        }
                                     } else if (productBuyStatus.equals("2")) {
                                         continue;
                                     }else{
@@ -186,8 +192,62 @@ public class Main {
                             Price = 0;
                         }
                         System.out.println("Total Price to be paid:"+total);
-                    }
-                    if(!(isLoggedIn)){
+                        System.out.println("Enter your username to complete checkout process");
+                        Scanner usernameScanner = new Scanner(System.in);
+                        String username = usernameScanner.nextLine();
+                        username = username.trim();
+                        userdb.updateUserProducts(conn,username,products);
+                        expenseOperations expensedb = new expenseOperations();
+                        productsdb.updateProductQuantity(conn,products,quantity);
+                        if(expensedb.checkIfPresent(conn,username)){
+                            expensedb.insertIntoUserExpense(conn,username,total);
+                        }else{
+                            expensedb.updateUserExpense(conn,username,total);
+                        }
+                        System.out.println("Checkout has been successfully done.Total Amount has been deducted from your bank account automatically");
+                        products.clear();
+                        quantity.clear();
+                    } else if (UserOptions.equals("8")) {
+                        System.out.println("products in your cart:");
+                        int Price  = 0;
+                        for(int i=0;i<products.size();i++){
+                            Price = productsdb.getPrice(conn,products.get(i));
+                            Price*=quantity.get(i);
+                            System.out.println(products.get(i)+"\tQuantity:"+quantity.get(i)+"\tPrice:"+Price);
+                            Price = 0;
+                            System.out.println();
+                        }
+                        while(true) {
+                            Scanner removeProducts = new Scanner(System.in);
+                            System.out.println("Enter 1 to remove some product from cart");
+                            System.out.println("Enter 2 to exit");
+                            String chosenOption = removeProducts.nextLine();
+                            chosenOption = chosenOption.trim();
+                            if(chosenOption.equals("1")){
+                                System.out.println("Enter Product name to be removed:");
+                                Scanner toBeRemovedScanner = new Scanner(System.in);
+                                String productName = toBeRemovedScanner.nextLine();
+                                productName = productName.trim();
+                                if(products.contains(productName)){
+                                    Scanner QuantityScanner = new Scanner(System.in);
+                                    int index = products.indexOf(productName);
+                                    System.out.println("Enter Quantity to be removed:");
+                                    int quantityToBeRemoved = QuantityScanner.nextInt();
+                                    if(quantityToBeRemoved>quantity.get(index)){
+                                        System.out.println("you have only "+quantity.get(index)+" "+productName+" but you are trying to remove "+quantityToBeRemoved);
+                                    }else{
+                                        int netQuantity = quantity.get(index) - quantityToBeRemoved;
+                                        quantity.set(index,netQuantity);
+                                        System.out.println("Successfully removed the given number of "+productName+" from your cart1");
+                                    }
+                                }
+                            } else if (chosenOption.equals("2")) {
+                                break;
+                            }else {
+                                System.out.println("please choose a valid option");
+                            }
+                        }
+                    } else if(!(isLoggedIn)){
                         System.out.println("\n************* Need Login to access these options *********\n");
                     }
                 }
