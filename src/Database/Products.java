@@ -209,7 +209,7 @@ public class Products {
 
             }
 
-            System.out.println("newQuantity updated!");
+
         }
         catch (Exception e)
         {

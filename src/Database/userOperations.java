@@ -303,7 +303,7 @@ public class userOperations {
                     st.setArray(1, array);
                     st.setString(2, username);
                     st.executeUpdate();
-                    System.out.println("products updated");
+
                 }
             }
         } catch (Exception e) {

@@ -199,6 +199,7 @@ public class employee{
         }
         return false;
     }
+
     public boolean readOneEmployee(Connection conn,String username){
         Statement statement;
         ResultSet rs = null;
@@ -345,5 +346,25 @@ public class employee{
         }
         return false;
     }
+
+    public void getUserBill(Connection conn, String username)
+    {
+        Statement statement;
+        ResultSet rs = null;
+        try{
+
+            String Query = String.format("select expense from userexpense where username = '%s';",username);
+            statement = conn.createStatement();
+            rs = statement.executeQuery(Query);
+            rs.next();
+            System.out.println("Total paid Bill is : "+rs.getInt("expense"));
+
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+
 }
 

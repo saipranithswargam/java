@@ -30,7 +30,6 @@ public class expenseOperations {
             String query=String.format("insert into userexpense values('%s','%d');",username, expense);
             statement=conn.createStatement();
             statement.executeUpdate(query);
-            System.out.println("Expense added in userExpenses!");
         }catch (Exception e){
             System.out.println(e);
         }
@@ -46,6 +45,21 @@ public class expenseOperations {
             statement.executeUpdate(query);
             System.out.println("Expense updated!");
         }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    public static void updateUserName(Connection conn, String oldUserName, String newUserName) {
+        Statement statement;
+
+        try {
+
+            String query = String.format("update userexpense set username='%s' where username='%s'", newUserName, oldUserName);
+            statement = conn.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("\n*********************UserName has been updated successfully!**********************");
+
+        } catch (Exception e) {
             System.out.println(e);
         }
     }

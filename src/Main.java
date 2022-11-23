@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import Database.*;
 import PersonManagement.*;
+import ProductManagement.marketAnalysis;
 import ProductManagement.product;
 
 public class Main {
@@ -109,6 +110,7 @@ public class Main {
                                 checkFlag = false;
                                 isLoggedIn = false;
                                 userdb.updateUserName(conn,oldUserName,newUserName);
+                                expenseOperations.updateUserName(conn,oldUserName,newUserName);
                                 System.out.println("*********************Logged Out Automatically********************\n");
                             }
                             else
@@ -387,6 +389,7 @@ public class Main {
                         }
                     } else if (AdminOption.equals("3") && isLoggedIn) {
                         System.out.println("Operation on Supermarket Management");
+                        marketAnalysis.market_analysis(conn);
                     } else if (AdminOption.equals("4") && isLoggedIn) {
                         System.out.println("Enter username of employee salary is to be managed:");
                         Scanner manageSalary = new Scanner(System.in);
@@ -558,6 +561,11 @@ public class Main {
                         }
                     } else if (EmployeeOption.equals("2")&&isLoggedIn){
                         System.out.println("Operation on Bill management");
+                        System.out.println("Enter username to get Bill : ");
+                        Scanner billscanner = new Scanner(System.in);
+                        String username = billscanner.next();
+                        username = username.trim();
+                        employeedb.getUserBill(conn,username);
                     } else if (EmployeeOption.equals("3")&&isLoggedIn) {
                         System.out.println("Operation on Stock management");
                         while(true){
