@@ -10,7 +10,7 @@
 
 <h2>About Project<h2>
   <ul>
-    <li>This Project is about Super Market Management System with **postgressql** as database </li>
+    <li>This Project is about Super Market Management System with postgressql as database </li>
     <li>It includes user account creation,employee account creation, Admin login with all neccessary logic for checkout and addition of products to cart</li>
   </ul>
       
