@@ -356,9 +356,11 @@ public class employee{
             String Query = String.format("select expense from userexpense where username = '%s';",username);
             statement = conn.createStatement();
             rs = statement.executeQuery(Query);
-            rs.next();
-            System.out.println("Total paid Bill is : "+rs.getInt("expense"));
-
+            if(rs.next()) {
+                System.out.println("Total paid Bill is : " + rs.getInt("expense"));
+            }else{
+                System.out.println("Toatal paid Bill is : 0");
+            }
         }
         catch (Exception e)
         {

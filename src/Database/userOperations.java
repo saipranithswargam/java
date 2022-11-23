@@ -33,7 +33,7 @@ public class userOperations {
             String query = String.format("insert into usertable(name, phonenumber, address, gender, answertosecurityquestion, username, password) values('%s','%s','%s','%s','%s','%s','%s');", name, phoneNumber, address, gender, answerToSecurityQuestion, username, password);
             statement = conn.createStatement();
             statement.executeUpdate(query);
-            System.out.println("Row inserted");
+            System.out.println("Account created successfully!");
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -79,19 +79,22 @@ public class userOperations {
     }
 
 
-    public void updateUserName(Connection conn, String oldUserName, String newUserName) {
+    public boolean updateUserName(Connection conn, String oldUserName, String newUserName) {
         Statement statement;
-
+        boolean res;
         try {
 
             String query = String.format("update usertable set username='%s' where username='%s'", newUserName, oldUserName);
             statement = conn.createStatement();
             statement.executeUpdate(query);
-            System.out.println("\n*********************UserName has been updated successfully!**********************");
+            res = true;
 
         } catch (Exception e) {
             System.out.println(e);
+            res = false;
+
         }
+        return res;
     }
 
 

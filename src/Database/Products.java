@@ -262,5 +262,48 @@ public class Products {
         }
         return res;
     }
+    public void deleteRowInProduct(Connection conn, String username)
+    {
+        Statement statement;
+
+        try{
+            String query = String.format("DELETE from products where productname = '%s'",username);
+            statement=conn.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("Row Deleted Successfully!");
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+
+    }
+
+    public boolean searchProductInRange(Connection conn, int lowerRange, int higherRange)
+    {
+        Statement statement;
+        ResultSet rs = null;
+        boolean res = false;
+        try{
+            String query = String.format("select * from products where price between '%d' and '%d';",lowerRange, higherRange);
+            statement= conn.createStatement();
+            rs = statement.executeQuery(query);
+            while(rs.next())
+            {
+
+                System.out.println("Product name:"+rs.getString("productname"));
+                System.out.println("quantity:"+rs.getString("quantity"));
+                System.out.println("Price:"+rs.getString("price"));
+                System.out.println("description:"+rs.getString("description"));
+                System.out.println();
+                res = true;
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+        return res;
+    }
 
 }

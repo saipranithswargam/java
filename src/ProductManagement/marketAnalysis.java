@@ -30,37 +30,31 @@ public class marketAnalysis {
     {
         Statement statement;
         ResultSet rs = null;
-        try{
-
-            {
-                String Query = String.format("select count(username) as totalUsers from usertable group by username");
-                statement = conn.createStatement();
-                rs = statement.executeQuery(Query);
-                if (rs.next()) {
-                    System.out.println("Total Registered users are : " + rs.getInt("totalUsers"));
-                } else {
-                    System.out.println("Total Registered users are : 0");
-                }
+        try {
+            String Query = String.format("select * from usertable");
+            statement = conn.createStatement();
+            int count = 0;
+            rs = statement.executeQuery(Query);//here this means it will execute the statement and return it to rs and result is iterable
+            while (rs.next()) {
+                count++;
             }
-
-            {
-                String Query = String.format("select count(username) as totalEmp from employee group by username");
-                statement = conn.createStatement();
-                rs = statement.executeQuery(Query);
-                if(rs.next()) {
-                    System.out.println("Total Registered employees are : " + rs.getInt("totalEmp"));
-                }
-                else{
-                    System.out.println("Total Registered employees are : 0");
-                }
-            }
-
-
-
+            System.out.println("Total Registered users are :"+count);
+        } catch (Exception e) {
+            System.out.println(e);
         }
-        catch (Exception e)
-        {
+        try{
+            String Query=String.format("select * from employee");
+            statement= conn.createStatement();;
+            rs=statement.executeQuery(Query);
+            int count = 0;
+            while(rs.next()){
+                count++;
+            }
+            System.out.println("Total Registered employees are :"+count);
+
+        }catch (Exception e){
             System.out.println(e);
         }
     }
+
 }

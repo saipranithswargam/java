@@ -2,7 +2,12 @@ package PersonManagement;
 
 import java.util.Scanner;
 
-public class User extends Person{
+interface createAccount{
+    void createUser();
+    void username();
+}
+
+public class User extends Person implements createAccount{
     private String UserName;
     private String Password;
     public User(String Name, String PhoneNumber, String Address, String Gender, String AnswerToSecurityQuestion, String UserName, String Password){

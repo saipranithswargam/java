@@ -10,7 +10,6 @@ public class adminTableOperations {
             String query=String.format("insert into admin(name, phonenumber, address, gender, answertosecurityquestion, username, password) values('%s','%s','%s','%s','%s','%s','%s');",name,phoneNumber,address,gender,answerToSecurityQuestion,username,password);
             statement=conn.createStatement();
             statement.executeUpdate(query);
-            System.out.println("Row inserted");
         }catch (Exception e){
             System.out.println(e);
         }
@@ -178,6 +177,7 @@ public class adminTableOperations {
     public boolean  checkIfPresent(Connection conn, String username){
         Statement statement;
         ResultSet rs = null;
+        boolean res = false;
         try{
             String Query=String.format("select * from employee where username = '%s'",username);
             statement= conn.createStatement();;
@@ -186,13 +186,13 @@ public class adminTableOperations {
 
             if(!rs.isBeforeFirst())
             {
-                System.out.println("user name is available");
-                return true;
+                res =  true;
             }
 
         }catch (Exception e){
             System.out.println(e);
+            res = false;
         }
-        return false;
+        return res;
     }
 }

@@ -2,7 +2,7 @@ package PersonManagement;
 
 import java.util.Scanner;
 
-public class Admin extends Person {
+public class Admin extends Person{
     private String UserName;
     private String Password;
     public Admin(String name, String phoneNumber, String address, String gender, String answerOfSecurityQuestion, String userName, String password) {

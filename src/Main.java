@@ -40,13 +40,28 @@ public class Main {
                     System.out.println("7.Checkout");
                     System.out.println("8.view cart");
                     System.out.println("9.Update user accounts using csv");
-                    System.out.println("10.Exit From operation");
+                    System.out.println("10.Delete your account");
+                    System.out.println("11.Exit From operation");
                     Scanner UserScanner = new Scanner(System.in);
                     String UserOptions = UserScanner.nextLine();
                     UserOptions = UserOptions.trim();
-                    if (UserOptions.equals("10")) {
+                    if (UserOptions.equals("11")) {
                         System.out.println("*********************Logged Out Automatically********************\n");
                         break;
+                    } else if (UserOptions.equals("10")) {
+                        Scanner deleteUserScanner = new Scanner(System.in);
+                        System.out.println("Enter Your  username:");
+                        String username = deleteUserScanner.nextLine();
+                        username = username.trim();
+                        System.out.println("Enter Your password");
+                        String password = deleteUserScanner.nextLine();
+                        password = password.trim();
+                        if(userOperations.userLogin(conn,username,password)){
+                            userdb.deleteRowInUser(conn,username);
+                        }else{
+                            System.out.println("Operation cannot be proceeded!");
+                        }
+
                     } else if (UserOptions.equals("1")) {
                         Scanner optionToAccount = new Scanner(System.in);
                         System.out.println("Enter 1 to manually set account of user");
@@ -109,7 +124,10 @@ public class Main {
 
                                 checkFlag = false;
                                 isLoggedIn = false;
-                                userdb.updateUserName(conn,oldUserName,newUserName);
+                                if(userdb.updateUserName(conn,oldUserName,newUserName))
+                                {
+                                    System.out.println("*********************UserName has been updated successfully!**********************");
+                                }
                                 expenseOperations.updateUserName(conn,oldUserName,newUserName);
                                 System.out.println("*********************Logged Out Automatically********************\n");
                             }
@@ -160,12 +178,26 @@ public class Main {
                             Scanner checkOutScanner = new Scanner(System.in);
                             System.out.println("1.search a product using name");
                             System.out.println("2.view all products available");
-                            System.out.println("3.exit");
+                            System.out.println("3.search products using price range");
+                            System.out.println("4.exit");
                             String userCheckoutOption = checkOutScanner.nextLine();
                             userCheckoutOption.trim();
-                            if(userCheckoutOption.equals("3")) {
+                            if(userCheckoutOption.equals("4")) {
                                 break;
-                            } else if (userCheckoutOption.equals("1")) {
+                            } else if (userCheckoutOption.equals("3")) {
+                                int Low;
+                                int High;
+                                Scanner PriceScanner = new Scanner(System.in);
+                                System.out.println("Enter the lower range:");
+                                Low = PriceScanner.nextInt();
+                                System.out.println("Enter higher range:");
+                                High = PriceScanner.nextInt();
+                                if(!productsdb.searchProductInRange(conn,Low,High)){
+                                    System.out.println("There are no products in the given range");
+                                    System.out.println();
+                                };
+                            }
+                            else if (userCheckoutOption.equals("1")) {
                                 System.out.println("Enter name of the product to be searched:");
                                 Scanner productScanner = new Scanner(System.in);
                                 String productname = productScanner.nextLine();
@@ -301,13 +333,20 @@ public class Main {
                     System.out.println("4.Salary Management of Employee");
                     System.out.println("5.Customer/User Management");
                     System.out.println("6.Add new collaborator");
-                    System.out.println("7.Exit From operation");
+                    System.out.println("7.Remove a collaborator");
+                    System.out.println("8.Exit From operation");
                     Scanner AdminScanner = new Scanner(System.in);
                     String AdminOption = AdminScanner.nextLine();
                     AdminOption = AdminOption.trim();
                     employee employeedb = new employee();
-                    if (AdminOption.equals("7")) {
+                    if (AdminOption.equals("8")) {
                         break;
+                    } else if (AdminOption.equals("7") && isLoggedIn) {
+                        System.out.println("Enter username of collaborator to be removed");
+                        Scanner deleteCollab = new Scanner(System.in);
+                        String username = deleteCollab.nextLine();
+                        username = username.trim();
+                        admindb.deleteRowInUser(conn,username);
                     } else if (AdminOption.equals("1")) {
                         Scanner adminLoginScanner = new Scanner(System.in);
                         System.out.println("Enter Your username");
@@ -390,6 +429,7 @@ public class Main {
                     } else if (AdminOption.equals("3") && isLoggedIn) {
                         System.out.println("Operation on Supermarket Management");
                         marketAnalysis.market_analysis(conn);
+
                     } else if (AdminOption.equals("4") && isLoggedIn) {
                         System.out.println("Enter username of employee salary is to be managed:");
                         Scanner manageSalary = new Scanner(System.in);
@@ -495,12 +535,11 @@ public class Main {
                     System.out.println("3.Stock Management");
                     System.out.println("4.Update Username");
                     System.out.println("5.Update password");
-                    System.out.println("6.Forgot password");
-                    System.out.println("7.Exit From operation");
+                    System.out.println("6.Exit From operation");
                     Scanner EmployeeScanner = new Scanner(System.in);
                     String EmployeeOption = EmployeeScanner.next();
                     EmployeeOption = EmployeeOption.trim();
-                    if (EmployeeOption.equals("7")) {
+                    if (EmployeeOption.equals("6")) {
                         break;
                     }else if(EmployeeOption.equals("4")&&isLoggedIn){
                         Scanner userUpdateScanner = new Scanner(System.in);
@@ -539,26 +578,6 @@ public class Main {
                         employeedb.updatePassword(conn,userName,password);
                         System.out.println("\n*********************Logged Out Automatically********************\n");
                         isLoggedIn = false;
-                    } else if (EmployeeOption.equals("6")) {
-                        Scanner forgotPasswordScanner = new Scanner(System.in);
-                        System.out.println("Enter Your username");
-                        String username = forgotPasswordScanner.nextLine();
-                        username = username.trim();
-                        while(true){
-                            System.out.println("Enter answer for the security question (First school you studied):");
-                            String answer = forgotPasswordScanner.nextLine();
-                            answer = answer.trim();
-                            if(employeedb.forgotPassword(conn,username,answer)){
-                                System.out.println("Enter new password for your account");
-                                String newPassword = forgotPasswordScanner.nextLine();
-                                newPassword = newPassword.trim();
-                                employeedb.updatePassword(conn,username,newPassword);
-                                break;
-                            }
-                            else{
-                                System.out.println("security answer provided is not correct try again !");
-                            }
-                        }
                     } else if (EmployeeOption.equals("2")&&isLoggedIn){
                         System.out.println("Operation on Bill management");
                         System.out.println("Enter username to get Bill : ");
@@ -577,7 +596,8 @@ public class Main {
                             System.out.println("5.Add/change quantity of a product");
                             System.out.println("6.Add products using csv file");
                             System.out.println("7.Update products using csv file");
-                            System.out.println("8:Exit");
+                            System.out.println("8.Remove a product");
+                            System.out.println("9:Exit");
                             Scanner StockManagement = new Scanner(System.in);
                             String StockManagenmentOption = StockManagement.nextLine();
                             StockManagenmentOption = StockManagenmentOption.trim();
@@ -653,7 +673,20 @@ public class Main {
                                     System.out.println("Something went wrong...Please try again !");
                                 }
                             } else if (StockManagenmentOption.equals("8")) {
+                                System.out.println("Enter name of the product to be deleted:");
+                                Scanner deleteProductScanner = new Scanner(System.in);
+                                String product = deleteProductScanner.nextLine();
+                                product = product.trim();
+                                if(!(productsdb.checkIfPresent(conn,product))) {
+                                    productsdb.deleteRowInProduct(conn, product);
+                                }else{
+                                    System.out.println("No such  product exits!");
+                                }
+                            } else if (StockManagenmentOption.equals("9")) {
                                 break;
+                            }
+                            else{
+                                System.out.println("Invalid Option!");
                             }
                         }
                     } else if (EmployeeOption.equals("1")) {
