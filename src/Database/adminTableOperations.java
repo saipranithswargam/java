@@ -1,3 +1,5 @@
+package Database;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -184,7 +186,7 @@ public class adminTableOperations {
 
             if(!rs.isBeforeFirst())
             {
-                System.out.println("We can insert");
+                System.out.println("user name is available");
                 return true;
             }
 

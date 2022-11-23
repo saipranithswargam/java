@@ -2,8 +2,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import java.util.SortedMap;
 
+import Database.*;
 import PersonManagement.*;
 import ProductManagement.product;
 
@@ -38,31 +38,52 @@ public class Main {
                     System.out.println("6.Add products to cart");
                     System.out.println("7.Checkout");
                     System.out.println("8.view cart");
-                    System.out.println("9.Exit From operation");
+                    System.out.println("9.Update user accounts using csv");
+                    System.out.println("10.Exit From operation");
                     Scanner UserScanner = new Scanner(System.in);
                     String UserOptions = UserScanner.nextLine();
                     UserOptions = UserOptions.trim();
-                    if (UserOptions.equals("9")) {
+                    if (UserOptions.equals("10")) {
                         System.out.println("*********************Logged Out Automatically********************\n");
                         break;
                     } else if (UserOptions.equals("1")) {
-                        User user = new User();
-                        boolean checkFlag = true;
-                        while(checkFlag){
-                            user.username();
-                            if(userdb.checkIfPresent(conn,user.getUserName()))
-                            {
+                        Scanner optionToAccount = new Scanner(System.in);
+                        System.out.println("Enter 1 to manually set account of user");
+                        System.out.println("Enter 2 to create accounts using csvFile");
+                        String chosenOption = optionToAccount.nextLine();
+                        chosenOption = chosenOption.trim();
+                        if (chosenOption.equals("1")) {
+                            User user = new User();
+                            boolean checkFlag = true;
+                            while (checkFlag) {
+                                user.username();
+                                if (userdb.checkIfPresent(conn, user.getUserName())) {
 
-                                checkFlag = false;
+                                    checkFlag = false;
+                                    user.createUser();
+                                    userdb.insertIntoUser(conn, user.getName(), user.getPhoneNumber(), user.getAddress(), user.getGender(), user.getAnswerOfSecurityQuestion(), user.getUserName(), user.getPassword());
+
+                                } else {
+                                    System.out.println("user name already exists ...Try Again(Enter 1 to exit from account creation process else enter any key to continue)");
+                                    Scanner userExitScanner = new Scanner(System.in);
+                                    String exitOption = userExitScanner.nextLine();
+                                    exitOption = exitOption.trim();
+                                    if (exitOption.equals("1")) {
+                                        break;
+                                    }
+                                }
                             }
-                            else
-                            {
-                                System.out.println("user name already exists ...Try Again");
+                        } else if (chosenOption.equals("2")) {
+                            if(userdb.updateInsertUser(conn)){
+                                System.out.println("User accounts has been created fom csv file");
+                            }else{
+                                System.out.println("Something went wrong please try again !");
                             }
+                        }else{
+                            System.out.println("Invalid option! Try again");
                         }
-                        user.createUser();
-                        userdb.insertIntoUser(conn,user.getName(),user.getPhoneNumber(),user.getAddress(),user.getGender(),user.getAnswerOfSecurityQuestion(),user.getUserName(),user.getPassword());
-                    }  else if (UserOptions.equals("2")) {
+                    }
+                    else if (UserOptions.equals("2")) {
                         Scanner userLoginScanner = new Scanner(System.in);
                         System.out.println("Enter Your username");
                         String Username = userLoginScanner.nextLine();
@@ -93,7 +114,7 @@ public class Main {
                             else
                             {
                                 System.out.println("user name already exists ...Try Again");
-                                System.out.println("Enter the new Username");
+                                System.out.println("Enter the new Username()");
                                 newUserName = userUpdateScanner.nextLine();
                                 newUserName.trim();
                             }
@@ -143,7 +164,7 @@ public class Main {
                             if(userCheckoutOption.equals("3")) {
                                 break;
                             } else if (userCheckoutOption.equals("1")) {
-                                System.out.println("Give name of the product to be searched:");
+                                System.out.println("Enter name of the product to be searched:");
                                 Scanner productScanner = new Scanner(System.in);
                                 String productname = productScanner.nextLine();
                                 if(productsdb.checkIfPresent(conn,productname)){
@@ -160,7 +181,7 @@ public class Main {
                                         int productQuantity = quantityScanner.nextInt();
                                         int quantityInStock = productsdb.readProductQuantity(conn,productname);
                                         if(quantityInStock<productQuantity){
-                                            System.out.println("Stock doesn't have mentioned quantity");
+                                            System.out.println("Insufficient quantity");
                                         }else{
                                             System.out.println("Product has been added to your cart");
                                             products.add(productname);
@@ -181,71 +202,86 @@ public class Main {
                         }
 
                     } else if (UserOptions.equals("7")) {
-                        System.out.println("here are the products in your cart:");
-                        int Price  = 0;
-                        int total = 0;
-                        for(int i=0;i<products.size();i++){
-                            Price = productsdb.getPrice(conn,products.get(i));
-                            Price*=quantity.get(i);
-                            total+=Price;
-                            System.out.println(products.get(i)+"\tQuantity:"+quantity.get(i)+"\tPrice:"+Price);
-                            Price = 0;
-                        }
-                        System.out.println("Total Price to be paid:"+total);
-                        System.out.println("Enter your username to complete checkout process");
-                        Scanner usernameScanner = new Scanner(System.in);
-                        String username = usernameScanner.nextLine();
-                        username = username.trim();
-                        userdb.updateUserProducts(conn,username,products);
-                        expenseOperations expensedb = new expenseOperations();
-                        productsdb.updateProductQuantity(conn,products,quantity);
-                        if(expensedb.checkIfPresent(conn,username)){
-                            expensedb.insertIntoUserExpense(conn,username,total);
-                        }else{
-                            expensedb.updateUserExpense(conn,username,total);
-                        }
-                        System.out.println("Checkout has been successfully done.Total Amount has been deducted from your bank account automatically");
-                        products.clear();
-                        quantity.clear();
-                    } else if (UserOptions.equals("8")) {
-                        System.out.println("products in your cart:");
-                        int Price  = 0;
-                        for(int i=0;i<products.size();i++){
-                            Price = productsdb.getPrice(conn,products.get(i));
-                            Price*=quantity.get(i);
-                            System.out.println(products.get(i)+"\tQuantity:"+quantity.get(i)+"\tPrice:"+Price);
-                            Price = 0;
-                            System.out.println();
-                        }
-                        while(true) {
-                            Scanner removeProducts = new Scanner(System.in);
-                            System.out.println("Enter 1 to remove some product from cart");
-                            System.out.println("Enter 2 to exit");
-                            String chosenOption = removeProducts.nextLine();
-                            chosenOption = chosenOption.trim();
-                            if(chosenOption.equals("1")){
-                                System.out.println("Enter Product name to be removed:");
-                                Scanner toBeRemovedScanner = new Scanner(System.in);
-                                String productName = toBeRemovedScanner.nextLine();
-                                productName = productName.trim();
-                                if(products.contains(productName)){
-                                    Scanner QuantityScanner = new Scanner(System.in);
-                                    int index = products.indexOf(productName);
-                                    System.out.println("Enter Quantity to be removed:");
-                                    int quantityToBeRemoved = QuantityScanner.nextInt();
-                                    if(quantityToBeRemoved>quantity.get(index)){
-                                        System.out.println("you have only "+quantity.get(index)+" "+productName+" but you are trying to remove "+quantityToBeRemoved);
-                                    }else{
-                                        int netQuantity = quantity.get(index) - quantityToBeRemoved;
-                                        quantity.set(index,netQuantity);
-                                        System.out.println("Successfully removed the given number of "+productName+" from your cart1");
-                                    }
-                                }
-                            } else if (chosenOption.equals("2")) {
-                                break;
-                            }else {
-                                System.out.println("please choose a valid option");
+                        if (products.size() == 0) {
+                            System.out.println("Your cart is empty add some products to your cart to checkout!");
+                        } else {
+                            System.out.println("here are the products in your cart:");
+                            int Price = 0;
+                            int total = 0;
+                            for (int i = 0; i < products.size(); i++) {
+                                Price = productsdb.getPrice(conn, products.get(i));
+                                Price *= quantity.get(i);
+                                total += Price;
+                                System.out.println(products.get(i) + "\tQuantity:" + quantity.get(i) + "\tPrice:" + Price);
+                                Price = 0;
                             }
+                            System.out.println("Total Price to be paid:" + total);
+                            System.out.println("Enter your username to complete checkout process");
+                            Scanner usernameScanner = new Scanner(System.in);
+                            String username = usernameScanner.nextLine();
+                            username = username.trim();
+                            userdb.updateUserProducts(conn, username, products);
+                            expenseOperations expensedb = new expenseOperations();
+                            productsdb.updateProductQuantity(conn, products, quantity);
+                            if (expensedb.checkIfPresent(conn, username)) {
+                                expensedb.insertIntoUserExpense(conn, username, total);
+                            } else {
+                                expensedb.updateUserExpense(conn, username, total);
+                            }
+                            System.out.println("Checkout has been successfully done.Total Amount has been deducted from your bank account automatically");
+                            products.clear();
+                            quantity.clear();
+                        }
+                    }else if (UserOptions.equals("8")) {
+                        if(products.size()==0){
+                            System.out.println("Your cart is empty");
+                        } else {
+
+                            System.out.println("products in your cart:");
+                            int Price = 0;
+                            for (int i = 0; i < products.size(); i++) {
+                                Price = productsdb.getPrice(conn, products.get(i));
+                                Price *= quantity.get(i);
+                                System.out.println(products.get(i) + "\tQuantity:" + quantity.get(i) + "\tPrice:" + Price);
+                                Price = 0;
+                                System.out.println();
+                            }
+                            while (true) {
+                                Scanner removeProducts = new Scanner(System.in);
+                                System.out.println("Enter 1 to remove some product from cart");
+                                System.out.println("Enter 2 to exit");
+                                String chosenOption = removeProducts.nextLine();
+                                chosenOption = chosenOption.trim();
+                                if (chosenOption.equals("1")) {
+                                    System.out.println("Enter Product name to be removed:");
+                                    Scanner toBeRemovedScanner = new Scanner(System.in);
+                                    String productName = toBeRemovedScanner.nextLine();
+                                    productName = productName.trim();
+                                    if (products.contains(productName)) {
+                                        Scanner QuantityScanner = new Scanner(System.in);
+                                        int index = products.indexOf(productName);
+                                        System.out.println("Enter Quantity to be removed:");
+                                        int quantityToBeRemoved = QuantityScanner.nextInt();
+                                        if (quantityToBeRemoved > quantity.get(index)) {
+                                            System.out.println("you have only " + quantity.get(index) + " " + productName + " but you are trying to remove " + quantityToBeRemoved);
+                                        } else {
+                                            int netQuantity = quantity.get(index) - quantityToBeRemoved;
+                                            quantity.set(index, netQuantity);
+                                            System.out.println("Successfully removed the given number of " + productName + " from your cart1");
+                                        }
+                                    }
+                                } else if (chosenOption.equals("2")) {
+                                    break;
+                                } else {
+                                    System.out.println("please choose a valid option");
+                                }
+                            }
+                        }
+                    } else if (UserOptions.equals("9")) {
+                        if(userdb.updateInsertUser(conn)){
+                            System.out.println("Users has been updated sucessfully from the csv file");
+                        }else{
+                            System.out.println("Something went wrong please try again!");
                         }
                     } else if(!(isLoggedIn)){
                         System.out.println("\n************* Need Login to access these options *********\n");
@@ -286,18 +322,19 @@ public class Main {
                             System.out.println("1.Add new Employee");
                             System.out.println("2.See Employee details based on username");
                             System.out.println("3.Get All Employees details");
-                            System.out.println("4.Exit");
+                            System.out.println("4.Add Employees using csv");
+                            System.out.println("5.Update Employee Details using csv");
+                            System.out.println("6.Exit");
                             Scanner employeeManagement = new Scanner(System.in);
                             String employeeeManagementOption  = employeeManagement.nextLine();
                             employeeeManagementOption = employeeeManagementOption.trim();
-                            if(employeeeManagementOption.equals("4")){
+                            if(employeeeManagementOption.equals("6")){
                                 break;
                             } else if (employeeeManagementOption.equals("1")) {
-//                                System.out.println("this is  to add a new employee");
                                 Employee e1 = new Employee();
                                 boolean checkFlag = true;
                                 while(checkFlag){
-                                    e1.username();
+                                    e1 = Admin.Employeeusername(e1);
                                     if(employeedb.checkIfPresent(conn,e1.getUsername()))
                                     {
 
@@ -308,7 +345,7 @@ public class Main {
                                         System.out.println("user name already exists ...Try Again");
                                     }
                                 }
-                                e1.createEmployee();
+                                e1 = Admin.createEmployee(e1);
                                 employeedb.insertIntoEmployee(conn,e1.getUsername(),e1.getPassword(),e1.getName(),e1.getPhoneNumber(),e1.getAddress(),e1.getGender(),e1.getAnswerOfSecurityQuestion(),e1.getSalary());
                             } else if (employeeeManagementOption.equals("2")) {
 //                                System.out.println("this is to see employee details based on their username");
@@ -331,14 +368,26 @@ public class Main {
 
                             } else if (employeeeManagementOption.equals("3")) {
                                 employeedb.readFromEmployeeTable(conn);
-                            }else{
+                            } else if (employeeeManagementOption.equals("4")) {
+                                if(employeedb.updateInsertEmployee(conn)){
+                                    System.out.println("Employees has been added from csv");
+                                }else {
+                                    System.out.println("Something went wrong please try again!");
+                                }
+                            } else if (employeeeManagementOption.equals("5")) {
+                                if(employeedb.updateInsertEmployee(conn)){
+                                    System.out.println("Employees has been updated from csv ");
+                                }else{
+                                    System.out.println("Something went wrong please try again");
+                                }
+                            } else
+                            {
                                 System.out.println("select a valid option");
                             }
                         }
                     } else if (AdminOption.equals("3") && isLoggedIn) {
                         System.out.println("Operation on Supermarket Management");
                     } else if (AdminOption.equals("4") && isLoggedIn) {
-//                        System.out.println("Operation on salary Management of Employee");
                         System.out.println("Enter username of employee salary is to be managed:");
                         Scanner manageSalary = new Scanner(System.in);
                         String username = manageSalary.nextLine();
@@ -349,6 +398,7 @@ public class Main {
                             {
 
                                 System.out.println("username entered doesn't exists");
+                                break;
                             }
                             else
                             {
@@ -394,6 +444,7 @@ public class Main {
                                     else
                                     {
                                         System.out.println("username entered doesnt exits");
+                                        break;
                                     }
                                 }
 
@@ -439,24 +490,86 @@ public class Main {
                     System.out.println("1.Employee Login");
                     System.out.println("2.Bill Management");
                     System.out.println("3.Stock Management");
-                    System.out.println("4.Exit From operation");
+                    System.out.println("4.Update Username");
+                    System.out.println("5.Update password");
+                    System.out.println("6.Forgot password");
+                    System.out.println("7.Exit From operation");
                     Scanner EmployeeScanner = new Scanner(System.in);
                     String EmployeeOption = EmployeeScanner.next();
                     EmployeeOption = EmployeeOption.trim();
-                    if (EmployeeOption.equals("4")) {
+                    if (EmployeeOption.equals("7")) {
                         break;
+                    }else if(EmployeeOption.equals("4")&&isLoggedIn){
+                        Scanner userUpdateScanner = new Scanner(System.in);
+                        System.out.println("Enter your Old username");
+                        String oldUserName = userUpdateScanner.nextLine();
+                        oldUserName = oldUserName.trim();
+                        System.out.println("Enter the new Username");
+                        String newUserName = userUpdateScanner.nextLine();
+                        newUserName = newUserName.trim();
+                        boolean checkFlag = true;
+                        while(checkFlag){
+                            if(employeedb.checkIfPresent(conn,newUserName))
+                            {
+
+                                checkFlag = false;
+                                isLoggedIn = false;
+                                employeedb.updateUserName(conn,oldUserName,newUserName);
+                                System.out.println("*********************Logged Out Automatically********************\n");
+                            }
+                            else
+                            {
+                                System.out.println("user name already exists ...Try Again");
+                                System.out.println("Enter the new Username");
+                                newUserName = userUpdateScanner.nextLine();
+                                newUserName.trim();
+                            }
+                        }
+                    } else if (EmployeeOption.equals("5") && isLoggedIn) {
+                        Scanner userUpdatePassScanner = new Scanner(System.in);
+                        System.out.println("Enter your username");
+                        String userName = userUpdatePassScanner.nextLine();
+                        userName = userName.trim();
+                        System.out.println("Enter the new Password");
+                        String password = userUpdatePassScanner.nextLine();
+                        password = password.trim();
+                        employeedb.updatePassword(conn,userName,password);
+                        System.out.println("\n*********************Logged Out Automatically********************\n");
+                        isLoggedIn = false;
+                    } else if (EmployeeOption.equals("6")) {
+                        Scanner forgotPasswordScanner = new Scanner(System.in);
+                        System.out.println("Enter Your username");
+                        String username = forgotPasswordScanner.nextLine();
+                        username = username.trim();
+                        while(true){
+                            System.out.println("Enter answer for the security question (First school you studied):");
+                            String answer = forgotPasswordScanner.nextLine();
+                            answer = answer.trim();
+                            if(employeedb.forgotPassword(conn,username,answer)){
+                                System.out.println("Enter new password for your account");
+                                String newPassword = forgotPasswordScanner.nextLine();
+                                newPassword = newPassword.trim();
+                                employeedb.updatePassword(conn,username,newPassword);
+                                break;
+                            }
+                            else{
+                                System.out.println("security answer provided is not correct try again !");
+                            }
+                        }
                     } else if (EmployeeOption.equals("2")&&isLoggedIn){
                         System.out.println("Operation on Bill management");
                     } else if (EmployeeOption.equals("3")&&isLoggedIn) {
                         System.out.println("Operation on Stock management");
                         while(true){
-                            System.out.println("Options available area s follows:");
+                            System.out.println("Options available are as follows:");
                             System.out.println("1.Add new Product");
                             System.out.println("2.Check details of all products");
                             System.out.println("3:Change price of a product");
                             System.out.println("4.Change product description of a product");
-                            System.out.println("5:Add/change quantity of a product");
-                            System.out.println("6:Exit");
+                            System.out.println("5.Add/change quantity of a product");
+                            System.out.println("6.Add products using csv file");
+                            System.out.println("7.Update products using csv file");
+                            System.out.println("8:Exit");
                             Scanner StockManagement = new Scanner(System.in);
                             String StockManagenmentOption = StockManagement.nextLine();
                             StockManagenmentOption = StockManagenmentOption.trim();
@@ -500,7 +613,7 @@ public class Main {
                                     System.out.println("Entered product doesn't Exist...You may add a new product!");
                                 }
                                 else{
-                                    System.out.println("Enter the new price of the product:");
+                                    System.out.println("Enter the new description of the product:");
                                     String newDescription = changeDescription.nextLine();
                                     productsdb.updateDescription(conn,name,newDescription);
                                 }
@@ -514,9 +627,24 @@ public class Main {
                                 else{
                                     System.out.println("Enter the new Quantity of the product:");
                                     int newQuantity = changeQuantity.nextInt();
-                                    productsdb.updatePrice(conn,name,newQuantity);
+                                    productsdb.updateQuantity(conn,name,newQuantity);
                                 }
                             } else if (StockManagenmentOption.equals("6")) {
+                                if(productsdb.updateInsertProducts(conn)){
+                                    System.out.println("Products has been inserted successfully from csv to database");
+                                }
+                                else {
+                                    System.out.println("Something went wrong...Please try again !");
+                                }
+
+                            } else if (StockManagenmentOption.equals("7")) {
+                                if(productsdb.updateInsertProducts(conn)){
+                                    System.out.println("Products has been updated successfully from csv to database");
+                                }
+                                else {
+                                    System.out.println("Something went wrong...Please try again !");
+                                }
+                            } else if (StockManagenmentOption.equals("8")) {
                                 break;
                             }
                         }

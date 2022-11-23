@@ -70,4 +70,50 @@ public class Admin extends Person {
         username = username.trim();
         this.setUserName(username);
     }
+    public static Employee createEmployee(Employee e1){
+        Scanner employeeManager = new Scanner(System.in);
+
+        System.out.println("Enter name");
+        String name = employeeManager.nextLine();
+        name = name.trim();
+        e1.setName(name);
+
+        System.out.println("Enter password");
+        String password = employeeManager.nextLine();
+        password = password.trim();
+        e1.setPassword(password);
+
+        System.out.println("Enter phone number");
+        String phno = employeeManager.nextLine();
+        phno = phno.trim();
+        e1.setPhoneNumber(phno);
+
+        System.out.println("Enter address");
+        String address = employeeManager.nextLine();
+        address = address.trim();
+        e1.setAddress(address);
+
+        System.out.println("Enter gender");
+        String gender = employeeManager.nextLine();
+        gender = gender.trim();
+        e1.setGender(gender);
+
+        System.out.println("What was your First School Name(Security Question):");
+        String answer = employeeManager.nextLine();
+        answer = answer.trim();
+        e1.setAnswerOfSecurityQuestion(answer);
+
+        e1.setSalary(0.0);
+
+        return e1;
+    }
+    public static Employee Employeeusername(Employee e1)
+    {
+        Scanner CreateUser = new Scanner(System.in);
+        System.out.println("Enter userName");
+        String username = CreateUser.nextLine();
+        username = username.trim();
+        e1.setUsername(username);
+        return e1;
+    }
 }

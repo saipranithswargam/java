@@ -1,5 +1,11 @@
+package Database;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.sql.*;
 import java.sql.Connection;
+import java.util.Scanner;
+
 public class employee{
     public Connection connect_to_db(String dbname, String user, String pass) {
 
@@ -25,7 +31,7 @@ public class employee{
             String query=String.format("insert into employee values('%s','%s','%s','%s','%s','%s','%s','%f');",username, password,name,phone,address,gender,secQuestion,salary);
             statement=conn.createStatement();
             statement.executeUpdate(query);
-            System.out.println("Row inserted");
+            System.out.println("Employee has been added");
         }catch (Exception e){
             System.out.println(e);
         }
@@ -48,7 +54,7 @@ public class employee{
               System.out.println("Phone number:"+rs.getString("phone"));
                 System.out.println("address:"+rs.getString("address"));
                System.out.println("Gender:"+rs.getString("gender"));
-               System.out.println("Gender:"+rs.getString("salary"));
+               System.out.println("Salary:"+rs.getString("salary"));
                String res = rs.getString("username");
                System.out.println();
                count++;
@@ -185,7 +191,6 @@ public class employee{
 
             if(!rs.isBeforeFirst())
             {
-                System.out.println("We can insert");
                 return true;
             }
 
@@ -259,6 +264,83 @@ public class employee{
         }
         catch (Exception e)
         {
+            System.out.println(e);
+        }
+        return false;
+    }
+    public boolean updateInsertEmployee(Connection connection) {
+        boolean res = false;
+        String line = "";
+        String splitBy = ",";
+        Scanner in = new Scanner(System.in);
+        try {
+            System.out.println("Enter the .csv file name");
+            String fileName = in.nextLine();
+            if (fileName.contains(".csv")) {
+                fileName = fileName.replace(".csv", "");
+            }
+            BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\sai pranith\\Desktop\\csvFiles\\"+fileName+".csv"));
+            int flag = 0;
+            while ((line = br.readLine()) != null) {
+                if (flag == 0) {
+                    flag = 1;
+                    continue;
+                }
+                String[] employee = line.split(splitBy);
+
+                Statement statement = connection.createStatement();
+                String query = "select * from employee where username='" + employee[0] + "'";
+                ResultSet resultSet = statement.executeQuery(query);
+                if (!resultSet.isBeforeFirst()) {
+                    String q = "insert into employee values(?,?,?,?,?,?,?,?)";
+                    PreparedStatement pstmt = connection.prepareStatement(q);
+
+                    pstmt.setString(1, employee[0]);
+                    pstmt.setString(2, employee[1]);
+                    pstmt.setString(3, employee[2]);
+                    pstmt.setString(4, employee[3]);
+                    pstmt.setString(5, employee[4]);
+                    pstmt.setString(6, employee[5]);
+                    pstmt.setString(7, employee[6]);
+                    pstmt.setDouble(8,Double.parseDouble(employee[7]));
+
+                    pstmt.executeUpdate();
+
+                }
+                else {
+                    String q = "update employee set name = '" + employee[2] + "',phone = '" + employee[3] + "',address = '" + employee[4] + "',gender='" + employee[5] +"',secquestion='" + employee[6] +"',password='" + employee[1] +"',salary=" + Double.parseDouble(employee[7]) + " where username='" + employee[0] + "'";
+                    PreparedStatement pstmt = connection.prepareStatement(q);
+                    pstmt.executeUpdate();
+                }
+                res = true;
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+    public boolean forgotPassword(Connection conn, String username, String answer) {
+        Statement statement;
+        ResultSet rs = null;
+        try {
+            String Query = String.format("select * from employee where username = '%s'", username);
+            statement = conn.createStatement();
+            rs = statement.executeQuery(Query);
+            if (!rs.isBeforeFirst()) {
+                return false;
+            } else {
+                if (rs.next()) {
+                    String answerToSecurityQuestion = rs.getString("secquestion");
+                    System.out.println(answerToSecurityQuestion);
+                    if (answer.equals(answerToSecurityQuestion)) {
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
             System.out.println(e);
         }
         return false;

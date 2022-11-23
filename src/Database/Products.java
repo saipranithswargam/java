@@ -1,6 +1,11 @@
+package Database;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.sql.*;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Products {
     public Connection connect_to_db(String dbname, String user, String pass) {
@@ -27,7 +32,7 @@ public class Products {
             String query = String.format("insert into products values('%s','%d','%d','%s');",productName,quantity,price,productDescription );
             statement = conn.createStatement();
             statement.executeUpdate(query);
-            System.out.println("Row inserted");
+            System.out.println("Product has been added!");
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -210,6 +215,52 @@ public class Products {
         {
             System.out.println(e);
         }
+    }
+    public boolean updateInsertProducts(Connection connection) {
+        boolean res = false;
+        String line = "";
+        String splitBy = ",";
+        Scanner in = new Scanner(System.in);
+        try {
+            System.out.println("Enter the .csv file name to be updated");
+            String fileName = in.nextLine();
+            if (fileName.contains(".csv")) {
+                fileName = fileName.replace(".csv", "");
+            }
+            BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\sai pranith\\Desktop\\csvFiles\\"+fileName+".csv"));
+            int flag = 0;
+            while ((line = br.readLine()) != null) {
+                if (flag == 0) {
+                    flag = 1;
+                    continue;
+                }
+                String[] products = line.split(splitBy);
+
+                Statement statement = connection.createStatement();
+                String query = "select * from products where productname='" + products[0] + "'";
+                ResultSet resultSet = statement.executeQuery(query);
+                if (!resultSet.isBeforeFirst()) {
+                    String q = "insert into products values(?,?,?,?)";
+                    PreparedStatement pstmt = connection.prepareStatement(q);
+                    int Quantity = Integer.parseInt(products[1]);
+                    int Price = Integer.parseInt(products[2]);
+                    pstmt.setString(1, products[0]);
+                    pstmt.setInt(2, Quantity);
+                    pstmt.setInt(3, Price);
+                    pstmt.setString(4, products[3]);
+                    pstmt.executeUpdate();
+                }
+                else {
+                    String q = "update products set quantity = " + Integer.parseInt(products[1]) + ",price = " + Integer.parseInt(products[2]) + ",description='" + products[3] +"' where productname='" + products[0] + "'";
+                    PreparedStatement pstmt = connection.prepareStatement(q);
+                    pstmt.executeUpdate();
+                }
+                res = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 
 }
