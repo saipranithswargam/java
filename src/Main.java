@@ -375,7 +375,7 @@ public class Main {
                                 Employee e1 = new Employee();
                                 boolean checkFlag = true;
                                 while(checkFlag){
-                                    e1 = Admin.Employeeusername(e1);
+                                    e1 = Admin.username(e1);
                                     if(employeedb.checkIfPresent(conn,e1.getUsername()))
                                     {
 
@@ -386,7 +386,7 @@ public class Main {
                                         System.out.println("user name already exists ...Try Again");
                                     }
                                 }
-                                e1 = Admin.createEmployee(e1);
+                                e1 = Admin.createAccount(e1);
                                 employeedb.insertIntoEmployee(conn,e1.getUsername(),e1.getPassword(),e1.getName(),e1.getPhoneNumber(),e1.getAddress(),e1.getGender(),e1.getAnswerOfSecurityQuestion(),e1.getSalary());
                             } else if (employeeeManagementOption.equals("2")) {
 //                                System.out.println("this is to see employee details based on their username");
@@ -504,7 +504,7 @@ public class Main {
                         Admin admin = new Admin();
                         boolean checkFlag = true;
                         while(checkFlag){
-                            admin.username();
+                            admin = Admin.username(admin);
                             if(admindb.checkIfPresent(conn,admin.getUserName()))
                             {
                                 checkFlag = false;
@@ -514,7 +514,7 @@ public class Main {
                                 System.out.println("user name already exists ...Try Again");
                             }
                         }
-                        admin.createAdmin();
+                        admin = Admin.createAccount(admin);
                         admindb.insertIntoAdmin(conn,admin.getName(),admin.getPhoneNumber(),admin.getAddress(),admin.getGender(),admin.getAnswerOfSecurityQuestion(),admin.getUserName(),admin.getPassword());
                     } else if (!isLoggedIn) {
                         System.out.println("*************************Login required to access these feilds*********************\n");

@@ -28,49 +28,52 @@ public class Admin extends Person{
     public void setPassword(String password) {
         Password = password;
     }
-    public void createAdmin(){
+    public static Admin createAccount(Admin admin){
 
         Scanner CreateAdmin = new Scanner(System.in);
 
         System.out.println("Enter password");
         String password = CreateAdmin.nextLine();
         password = password.trim();
-        this.setPassword(password);
+        admin.setPassword(password);
 
         System.out.println("Enter Your Name :");
         String Name = CreateAdmin.nextLine();
         Name = Name.trim();
-        this.setName(Name);
+        admin.setName(Name);
 
         System.out.println("Choose Gender (M/F):");
         String Gender = CreateAdmin.nextLine();
         Gender = Gender.trim();
-        this.setGender(Gender);
+        admin.setGender(Gender);
 
         System.out.println("Enter Your Mobile Number :");
         String Mobile_Number = CreateAdmin.nextLine();
         Mobile_Number = Mobile_Number.trim();
-        this.setPhoneNumber(Mobile_Number);
+        admin.setPhoneNumber(Mobile_Number);
 
         System.out.println("Enter Your Address :");
         String Address = CreateAdmin.nextLine();
         Address = Address.trim();
-        this.setAddress(Address);
+        admin.setAddress(Address);
 
         System.out.println("What was your First School Name(Security Question):");
         String SecurityQuestion = CreateAdmin.nextLine();
         SecurityQuestion = SecurityQuestion.trim();
-        this.setAnswerOfSecurityQuestion(SecurityQuestion);
+        admin.setAnswerOfSecurityQuestion(SecurityQuestion);
+
+        return admin;
     }
-    public void username()
+    public static Admin username(Admin admin)
     {
         Scanner CreateUser = new Scanner(System.in);
         System.out.println("Enter userName");
         String username = CreateUser.nextLine();
         username = username.trim();
-        this.setUserName(username);
+        admin.setUserName(username);
+        return admin;
     }
-    public static Employee createEmployee(Employee e1){
+    public static Employee createAccount(Employee e1){
         Scanner employeeManager = new Scanner(System.in);
 
         System.out.println("Enter name");
@@ -107,7 +110,7 @@ public class Admin extends Person{
 
         return e1;
     }
-    public static Employee Employeeusername(Employee e1)
+    public static Employee username(Employee e1)
     {
         Scanner CreateUser = new Scanner(System.in);
         System.out.println("Enter userName");
