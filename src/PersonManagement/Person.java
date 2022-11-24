@@ -1,6 +1,7 @@
 package PersonManagement;
 
 
+import java.util.Scanner;
 
 class Person {
     protected String Name;
@@ -55,5 +56,12 @@ class Person {
 
     public void setAnswerOfSecurityQuestion(String answerOfSecurityQuestion) {
         AnswerOfSecurityQuestion = answerOfSecurityQuestion;
+    }
+    public void username(){
+        Scanner usernameScanner = new Scanner(System.in);
+        System.out.println("Enter Username:");
+        String name = usernameScanner.nextLine();
+        name = name.trim();
+        this.setName(name);
     }
 }
