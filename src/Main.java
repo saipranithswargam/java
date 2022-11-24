@@ -46,20 +46,29 @@ public class Main {
                     String UserOptions = UserScanner.nextLine();
                     UserOptions = UserOptions.trim();
                     if (UserOptions.equals("11")) {
-                        System.out.println("*********************Logged Out Automatically********************\n");
+                        System.out.println("********************************Logged Out Automatically********************\n");
                         break;
                     } else if (UserOptions.equals("10")) {
-                        Scanner deleteUserScanner = new Scanner(System.in);
-                        System.out.println("Enter Your  username:");
-                        String username = deleteUserScanner.nextLine();
-                        username = username.trim();
-                        System.out.println("Enter Your password");
-                        String password = deleteUserScanner.nextLine();
-                        password = password.trim();
-                        if(userOperations.userLogin(conn,username,password)){
-                            userdb.deleteRowInUser(conn,username);
-                        }else{
-                            System.out.println("Operation cannot be proceeded!");
+                        boolean flag = true;
+                        while(flag) {
+                            Scanner deleteUserScanner = new Scanner(System.in);
+                            System.out.println("Enter Your  username:");
+                            String username = deleteUserScanner.nextLine();
+                            username = username.trim();
+                            if(!userdb.checkIfPresent(conn,username)){
+                                flag = false;
+                            System.out.println("Enter Your password");
+                            String password = deleteUserScanner.nextLine();
+                            password = password.trim();
+                            if (userOperations.userLogin(conn, username, password)) {
+                                userdb.deleteRowInUser(conn, username);
+                            } else {
+                                System.out.println("Operation cannot be proceeded!");
+                            }
+                            }
+                            else{
+                                System.out.println("No such user exist!");
+                            }
                         }
 
                     } else if (UserOptions.equals("1")) {
@@ -110,65 +119,84 @@ public class Main {
                         userOperations.userLogin(conn,Username,Password);
                         isLoggedIn = true;
                     } else if (UserOptions.equals("3") && isLoggedIn) {
+                        boolean flag = true;
+                        while (flag){
                         Scanner userUpdateScanner = new Scanner(System.in);
                         System.out.println("Enter your Old username");
                         String oldUserName = userUpdateScanner.nextLine();
                         oldUserName = oldUserName.trim();
+                        if(!userdb.checkIfPresent(conn,oldUserName)){
+                            flag = false;
                         System.out.println("Enter the new Username");
                         String newUserName = userUpdateScanner.nextLine();
                         newUserName = newUserName.trim();
                         boolean checkFlag = true;
-                        while(checkFlag){
-                            if(userdb.checkIfPresent(conn,newUserName))
-                            {
-
+                        while(checkFlag) {
+                            if (userdb.checkIfPresent(conn, newUserName)) {
                                 checkFlag = false;
                                 isLoggedIn = false;
-                                if(userdb.updateUserName(conn,oldUserName,newUserName))
-                                {
+                                if (userdb.updateUserName(conn, oldUserName, newUserName)) {
                                     System.out.println("*********************UserName has been updated successfully!**********************");
                                 }
-                                expenseOperations.updateUserName(conn,oldUserName,newUserName);
-                                System.out.println("*********************Logged Out Automatically********************\n");
-                            }
-                            else
-                            {
+                                expenseOperations.updateUserName(conn, oldUserName, newUserName);
+                                System.out.println("*********************Logged Out Automatically*****************************\n");
+                            } else {
                                 System.out.println("user name already exists ...Try Again");
                                 System.out.println("Enter the new Username()");
                                 newUserName = userUpdateScanner.nextLine();
                                 newUserName.trim();
                             }
                         }
+                        }
+                        else{
+                            System.out.println("No such user exits!");
+                        }
+                        }
                     } else if (UserOptions.equals("4")  && isLoggedIn) {
-                        Scanner userUpdatePassScanner = new Scanner(System.in);
-                        System.out.println("Enter your username");
-                        String userName = userUpdatePassScanner.nextLine();
-                        userName = userName.trim();
-                        System.out.println("Enter the new Password");
-                        String password = userUpdatePassScanner.nextLine();
-                        password = password.trim();
-                        userdb.updatePassword(conn,userName,password);
-                        System.out.println("\n*********************Logged Out Automatically********************\n");
-                        isLoggedIn = false;
+                        boolean flag = true;
+                        while(flag) {
+                            Scanner userUpdatePassScanner = new Scanner(System.in);
+                            System.out.println("Enter your username");
+                            String userName = userUpdatePassScanner.nextLine();
+                            userName = userName.trim();
+                            if(!userdb.checkIfPresent(conn,userName)) {
+                                flag = false;
+                                System.out.println("Enter the new Password");
+                                String password = userUpdatePassScanner.nextLine();
+                                password = password.trim();
+                                userdb.updatePassword(conn, userName, password);
+                                System.out.println("\n*****************************Logged Out Automatically*******************************\n");
+                                isLoggedIn = false;
+                            }else{
+                                System.out.println("No such user exits");
+                            }
+                        }
                     } else if (UserOptions.equals("5")) {
-                        Scanner forgotPasswordScanner = new Scanner(System.in);
-                        System.out.println("Enter Your username");
-                        String username = forgotPasswordScanner.nextLine();
-                        username = username.trim();
-                        while(true){
-                        System.out.println("Enter answer for the security question (First school you studied):");
-                        String answer = forgotPasswordScanner.nextLine();
-                        answer = answer.trim();
-                        if(userdb.forgotPassword(conn,username,answer)){
-                            System.out.println("Enter new password for your account");
-                            String newPassword = forgotPasswordScanner.nextLine();
-                            newPassword = newPassword.trim();
-                            userdb.updatePassword(conn,username,newPassword);
-                            break;
-                          }
-                          else{
-                              System.out.println("security answer provided is not correct try again !");
-                          }
+                        boolean flag = true;
+                        while(flag) {
+                            Scanner forgotPasswordScanner = new Scanner(System.in);
+                            System.out.println("Enter Your username");
+                            String username = forgotPasswordScanner.nextLine();
+                            username = username.trim();
+                            if(!userdb.checkIfPresent(conn,username)) {
+                                flag = false;
+                                while (true) {
+                                    System.out.println("Enter answer for the security question (First school you studied):");
+                                    String answer = forgotPasswordScanner.nextLine();
+                                    answer = answer.trim();
+                                    if (userdb.forgotPassword(conn, username, answer)) {
+                                        System.out.println("Enter new password for your account");
+                                        String newPassword = forgotPasswordScanner.nextLine();
+                                        newPassword = newPassword.trim();
+                                        userdb.updatePassword(conn, username, newPassword);
+                                        break;
+                                    } else {
+                                        System.out.println("Security answer provided is not correct try again !");
+                                    }
+                                }
+                            }else{
+                                System.out.println("No such username exits!");
+                            }
                         }
 
                     } else if (UserOptions.equals("6") && isLoggedIn) {
@@ -176,10 +204,10 @@ public class Main {
                         System.out.println("Options available are as follows:");
                         while (true) {
                             Scanner checkOutScanner = new Scanner(System.in);
-                            System.out.println("1.search a product using name");
-                            System.out.println("2.view all products available");
-                            System.out.println("3.search products using price range");
-                            System.out.println("4.exit");
+                            System.out.println("1.Search a product using name");
+                            System.out.println("2.View all products available");
+                            System.out.println("3.Search products using price range");
+                            System.out.println("4.Exit");
                             String userCheckoutOption = checkOutScanner.nextLine();
                             userCheckoutOption.trim();
                             if(userCheckoutOption.equals("4")) {
@@ -239,7 +267,7 @@ public class Main {
                         if (products.size() == 0) {
                             System.out.println("Your cart is empty add some products to your cart to checkout!");
                         } else {
-                            System.out.println("here are the products in your cart:");
+                            System.out.println("These are the products in your cart:");
                             int Price = 0;
                             int total = 0;
                             for (int i = 0; i < products.size(); i++) {
@@ -271,7 +299,7 @@ public class Main {
                             System.out.println("Your cart is empty");
                         } else {
 
-                            System.out.println("products in your cart:");
+                            System.out.println("These are the products in your cart:");
                             int Price = 0;
                             for (int i = 0; i < products.size(); i++) {
                                 Price = productsdb.getPrice(conn, products.get(i));
@@ -297,7 +325,7 @@ public class Main {
                                         System.out.println("Enter Quantity to be removed:");
                                         int quantityToBeRemoved = QuantityScanner.nextInt();
                                         if (quantityToBeRemoved > quantity.get(index)) {
-                                            System.out.println("you have only " + quantity.get(index) + " " + productName + " but you are trying to remove " + quantityToBeRemoved);
+                                            System.out.println("You have only " + quantity.get(index) + " " + productName + " but you are trying to remove " + quantityToBeRemoved);
                                         } else {
                                             int netQuantity = quantity.get(index) - quantityToBeRemoved;
                                             quantity.set(index, netQuantity);
@@ -307,7 +335,7 @@ public class Main {
                                 } else if (chosenOption.equals("2")) {
                                     break;
                                 } else {
-                                    System.out.println("please choose a valid option");
+                                    System.out.println("Please choose a valid option");
                                 }
                             }
                         }
@@ -383,7 +411,7 @@ public class Main {
                                     }
                                     else
                                     {
-                                        System.out.println("user name already exists ...Try Again");
+                                        System.out.println("User name already exists ...Try Again");
                                     }
                                 }
                                 e1 = Admin.createAccount(e1);
@@ -403,7 +431,7 @@ public class Main {
                                     }
                                     else
                                     {
-                                        System.out.println("username entered doesnt exits");
+                                        System.out.println("Username entered doesnt exits");
                                     }
                                 }
 
@@ -423,7 +451,7 @@ public class Main {
                                 }
                             } else
                             {
-                                System.out.println("select a valid option");
+                                System.out.println("Please select a valid option");
                             }
                         }
                     } else if (AdminOption.equals("3") && isLoggedIn) {
@@ -440,18 +468,18 @@ public class Main {
                             if(employeedb.checkIfPresent(conn,username))
                             {
 
-                                System.out.println("username entered doesn't exists");
+                                System.out.println("The username entered does not exist");
                                 break;
                             }
                             else
                             {
-                                System.out.println("Enter amount that salary is to be changed:");
+                                System.out.println("Enter the updated salary amount of the employee:");
                                 Scanner salaryScanner = new Scanner(System.in);
                                 double salary = 0;
                                 try{
                                     salary = salaryScanner.nextDouble();
                                 }catch (InputMismatchException e){
-                                    System.out.println("the given input is invalid!");
+                                    System.out.println("The given input is invalid!");
                                     continue;
                                 }
                                 employeedb.updateSalary(conn,username,salary);
@@ -486,7 +514,7 @@ public class Main {
                                     }
                                     else
                                     {
-                                        System.out.println("username entered doesnt exits");
+                                        System.out.println("The username entered does not exit");
                                         break;
                                     }
                                 }
@@ -500,7 +528,7 @@ public class Main {
                         }
                     }
                     else if (AdminOption.equals("6")) {
-                        System.out.println("Add new collaborator");
+                        System.out.println("Add a new collaborator");
                         Admin admin = new Admin();
                         boolean checkFlag = true;
                         while(checkFlag){
@@ -511,7 +539,7 @@ public class Main {
                             }
                             else
                             {
-                                System.out.println("user name already exists ...Try Again");
+                                System.out.println("Username already exists ... Please try again");
                             }
                         }
                         admin = Admin.createAccount(admin);
@@ -542,29 +570,34 @@ public class Main {
                     if (EmployeeOption.equals("6")) {
                         break;
                     }else if(EmployeeOption.equals("4")&&isLoggedIn){
-                        Scanner userUpdateScanner = new Scanner(System.in);
-                        System.out.println("Enter your Old username");
-                        String oldUserName = userUpdateScanner.nextLine();
-                        oldUserName = oldUserName.trim();
-                        System.out.println("Enter the new Username");
-                        String newUserName = userUpdateScanner.nextLine();
-                        newUserName = newUserName.trim();
-                        boolean checkFlag = true;
-                        while(checkFlag){
-                            if(employeedb.checkIfPresent(conn,newUserName))
-                            {
-
-                                checkFlag = false;
-                                isLoggedIn = false;
-                                employeedb.updateUserName(conn,oldUserName,newUserName);
-                                System.out.println("*********************Logged Out Automatically********************\n");
-                            }
-                            else
-                            {
-                                System.out.println("user name already exists ...Try Again");
+                        boolean check = true;
+                        while (check) {
+                            Scanner userUpdateScanner = new Scanner(System.in);
+                            System.out.println("Enter your Old username");
+                            String oldUserName = userUpdateScanner.nextLine();
+                            oldUserName = oldUserName.trim();
+                            if (!employeedb.checkIfPresent(conn, oldUserName)) {
+                                check = false;
                                 System.out.println("Enter the new Username");
-                                newUserName = userUpdateScanner.nextLine();
-                                newUserName.trim();
+                                String newUserName = userUpdateScanner.nextLine();
+                                newUserName = newUserName.trim();
+                                boolean checkFlag = true;
+                                while (checkFlag) {
+                                    if (employeedb.checkIfPresent(conn, newUserName)) {
+
+                                        checkFlag = false;
+                                        isLoggedIn = false;
+                                        employeedb.updateUserName(conn, oldUserName, newUserName);
+                                        System.out.println("*********************Logged Out Automatically********************\n");
+                                    } else {
+                                        System.out.println("This username already exists ...Try Again");
+                                        System.out.println("Enter the new Username");
+                                        newUserName = userUpdateScanner.nextLine();
+                                        newUserName.trim();
+                                    }
+                                }
+                            } else {
+                                System.out.println("No such username exists");
                             }
                         }
                     } else if (EmployeeOption.equals("5") && isLoggedIn) {

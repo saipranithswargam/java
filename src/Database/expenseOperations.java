@@ -49,19 +49,21 @@ public class expenseOperations {
         }
     }
 
-    public static void updateUserName(Connection conn, String oldUserName, String newUserName) {
+    public static boolean updateUserName(Connection conn, String oldUserName, String newUserName) {
         Statement statement;
-
+        boolean rs = false;
         try {
 
             String query = String.format("update userexpense set username='%s' where username='%s'", newUserName, oldUserName);
             statement = conn.createStatement();
             statement.executeUpdate(query);
-            System.out.println("\n*********************UserName has been updated successfully!**********************");
+            rs = true;
 
         } catch (Exception e) {
             System.out.println(e);
+            rs = false;
         }
+        return  rs;
     }
 
     public boolean  checkIfPresent(Connection conn, String username){

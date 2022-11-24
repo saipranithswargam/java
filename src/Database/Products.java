@@ -270,7 +270,7 @@ public class Products {
             String query = String.format("DELETE from products where productname = '%s'",username);
             statement=conn.createStatement();
             statement.executeUpdate(query);
-            System.out.println("Row Deleted Successfully!");
+            System.out.println("Product removed Successfully!");
         }
         catch (Exception e)
         {

@@ -71,7 +71,7 @@ public class userOperations {
             String query = String.format("DELETE from usertable where username = '%s'", username);
             statement = conn.createStatement();
             statement.executeUpdate(query);
-            System.out.println("Row Deleted Successfully!");
+            System.out.println("Account has been Deleted Successfully!");
         } catch (Exception e) {
             System.out.println(e);
         }

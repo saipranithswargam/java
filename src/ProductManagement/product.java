@@ -49,7 +49,7 @@ public class product {
     }
     public void createProduct(){
         Scanner ProductScanner = new Scanner(System.in);
-        System.out.println("Enter price price of the product:");
+        System.out.println("Enter price of the product:");
         int price = ProductScanner.nextInt();
         System.out.println("Enter Quantity of the product:");
         int quantity  = ProductScanner.nextInt();

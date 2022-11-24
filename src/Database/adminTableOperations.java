@@ -42,7 +42,7 @@ public class adminTableOperations {
             String query = String.format("DELETE from admin where username = '%s'",username);
             statement=conn.createStatement();
             statement.executeUpdate(query);
-            System.out.println("Row Deleted Successfully!");
+            System.out.println("Admin account has been Deleted Successfully!");
         }
         catch (Exception e)
         {
@@ -179,7 +179,7 @@ public class adminTableOperations {
         ResultSet rs = null;
         boolean res = false;
         try{
-            String Query=String.format("select * from employee where username = '%s'",username);
+            String Query=String.format("select * from admin where username = '%s'",username);
             statement= conn.createStatement();;
 
             rs=statement.executeQuery(Query);
